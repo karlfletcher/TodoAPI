@@ -48,9 +48,20 @@ app.post('/todos', function(req, res){
 	}else{
 		return res.status(400).send();
 	}
-
-
 })
+
+app.delete('/todos/:id', function(req, res){
+	var todoID = parseInt(req.params.id, 10);
+	var matchedTodo = _.findWhere(todoList, {id: todoID});
+
+	if(!matchedTodo){
+		res.status(404).json({"Error" : "No task with given id found"});
+	}else{
+		todoList = _.without(todoList, matchedTodo);
+		res.json(matchedTodo);
+	}
+
+});
 
 //LISTENER
 app.listen(PORT, function(){
