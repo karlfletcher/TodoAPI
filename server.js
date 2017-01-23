@@ -44,7 +44,7 @@ app.post('/todos', function(req, res){
 		body.description = body.description.trim();
 
 		todoList.push(body);
-		res.json(todoItem);
+		res.json(body);
 	}else{
 		return res.status(400).send();
 	}
