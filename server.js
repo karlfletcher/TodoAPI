@@ -29,8 +29,12 @@ app.get('/todos', function(req, res){
 			filteredTodos = _.where(todoList, {completed: true})
 		else
 			filteredTodos = _.where(todoList, {completed: false})
-	}else{
-		return res.json(todoList);
+	}
+
+	if(queryParams.q && queryParams.q.length > 0){
+		filteredTodos = _.filter(filteredTodos, function(todo){
+				return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
+		})
 	}
 
 	return res.json(filteredTodos);
