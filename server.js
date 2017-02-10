@@ -20,7 +20,20 @@ app.get('/', function(req, res){
 
 //GET todos
 app.get('/todos', function(req, res){
-	return res.json(todoList);
+	
+	var queryParams = req.query;
+	var filteredTodos = todoList;
+
+	if(queryParams.completed){
+		if(queryParams.completed == "true")
+			filteredTodos = _.where(todoList, {completed: true})
+		else
+			filteredTodos = _.where(todoList, {completed: false})
+	}else{
+		return res.json(todoList);
+	}
+
+	return res.json(filteredTodos);
 });
 
 //GET todos/:id
@@ -93,4 +106,4 @@ app.put('/todos/:id', function(req, res){
 //LISTENER
 app.listen(PORT, function(){
 	console.log("Server started. Listening on port "+PORT+"...");
-})
+});
