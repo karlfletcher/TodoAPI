@@ -98,7 +98,7 @@ app.put('/todos/:id', function(req, res){
 		attributes.description = body.description;
 
 	if(body.hasOwnProperty("completed"))
-		attributes.completed = (body.completed == "true" ? true : false);
+		attributes.completed = body.completed;
 
 console.log(attributes);
 
