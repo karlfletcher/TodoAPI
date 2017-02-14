@@ -2,6 +2,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
+var db = require('./db.js');
 
 //APP SETUP
 var app = express();
@@ -53,18 +54,15 @@ app.get('/todos/:id', function(req, res){
 
 //POST todos
 app.post('/todos', function(req, res){
+
 	var body = _.pick(req.body, "description", "completed");
 	
-	if(_.isString(body.description) && body.description.trim() != "" && _.isBoolean(body.completed)){
-		body.id = todoNextID++;
-
-		body.description = body.description.trim();
-
-		todoList.push(body);
-		res.json(body);
-	}else{
-		return res.status(400).send();
-	}
+	db.todo.create(body).then(function(todo){
+		res.status(200).send(todo);
+	}).catch(function(e){
+		res.status(400).json(e);
+	});
+	``
 })
 
 app.delete('/todos/:id', function(req, res){
@@ -107,7 +105,11 @@ app.put('/todos/:id', function(req, res){
 
 });
 
-//LISTENER
-app.listen(PORT, function(){
-	console.log("Server started. Listening on port "+PORT+"...");
-});
+//We only start the listener if the db connection synced correctly.
+db.sequelize.sync().then(function(){
+	//LISTENER
+	app.listen(PORT, function(){
+		console.log("Server started. Listening on port "+PORT+"...");
+	});	
+})
+
