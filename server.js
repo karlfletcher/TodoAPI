@@ -68,7 +68,6 @@ app.post('/todos', function(req, res){
 	}).catch(function(e){
 		res.status(400).json(e);
 	});
-	``
 })
 
 app.delete('/todos/:id', function(req, res){
@@ -100,8 +99,6 @@ app.put('/todos/:id', function(req, res){
 	if(body.hasOwnProperty("completed"))
 		attributes.completed = body.completed;
 
-console.log(attributes);
-
 	db.todo.findById(req.params.id).then(function(todo){
 
 		if(todo)
@@ -122,6 +119,18 @@ console.log(attributes);
 		res.status(500).send(error);
 
 	})
+
+});
+
+app.post('/users', function(req, res){
+
+	var body = _.pick(req.body, "email", "password");
+	
+	db.user.create(body).then(function(user){
+		res.status(200).send(user);
+	}).catch(function(e){
+		res.status(400).json(e);
+	});
 
 });
 
