@@ -31,18 +31,18 @@ app.get('/todos', function(req, res){
 		else
 			where.completed = false;
 
-	if(query.q && query.q.length > 0)
-		where.description = {
-			$like: "%"+query.q+"%"
-		}
+		if(query.q && query.q.length > 0)
+			where.description = {
+				$like: "%"+query.q+"%"
+			}
 
-	db.todo.findAll({where: where}).then(function(todos){
-		res.json(todos);
-	}).catch(function(error){
-		res.status(500).send(error);
-	});
+			db.todo.findAll({where: where}).then(function(todos){
+				res.json(todos);
+			}).catch(function(error){
+				res.status(500).send(error);
+			});
 
-});
+		});
 
 //GET todos/:id
 app.get('/todos/:id', function(req, res){
@@ -92,27 +92,36 @@ app.delete('/todos/:id', function(req, res){
 //PUT /todos/:id
 app.put('/todos/:id', function(req, res){
 	var body = _.pick(req.body, 'description', 'completed');
-	var validAttributes = {};
+	var attributes = {};
 
-	var matchedTodo = _.findWhere(todoList, {id: parseInt(req.params.id, 10)});
-	if(!matchedTodo){
-			return res.status(404).json({"Error" : "No task with given id found"});
-	}
+	if(body.description)
+		attributes.description = body.description;
 
-	if(body.hasOwnProperty('completed') && _.isBoolean(body.completed)){
-		validAttributes.completed = body.completed;
-	}else if(body.hasOwnProperty('completed')){
-		return res.status(400).send();
-	}
+	if(body.hasOwnProperty("completed"))
+		attributes.completed = (body.completed == "true" ? true : false);
 
-	if(body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0){
-		validAttributes.description = body.description;
-	}else if(body.hasOwnProperty('description')){
-		return res.status(400).send();
-	}
+console.log(attributes);
 
-	_.extend(matchedTodo, validAttributes);
-	res.json(matchedTodo);
+	db.todo.findById(req.params.id).then(function(todo){
+
+		if(todo)
+			todo.update(attributes).then(function(todo){
+
+				res.json(todo);
+
+			}, function(error){
+
+				res.status(400).json(error);
+
+			})
+		else
+			res.status(404).send();
+
+	}, function(error){
+
+		res.status(500).send(error);
+
+	})
 
 });
 
