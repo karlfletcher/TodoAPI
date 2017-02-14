@@ -22,23 +22,26 @@ app.get('/', function(req, res){
 //GET todos
 app.get('/todos', function(req, res){
 	
-	var queryParams = req.query;
-	var filteredTodos = todoList;
+	var query = req.query;
+	var where = {};
 
-	if(queryParams.completed){
-		if(queryParams.completed == "true")
-			filteredTodos = _.where(todoList, {completed: true})
+	if(query.completed)
+		if(query.completed === true)
+			where.completed = true;
 		else
-			filteredTodos = _.where(todoList, {completed: false})
-	}
+			where.completed = false;
 
-	if(queryParams.q && queryParams.q.length > 0){
-		filteredTodos = _.filter(filteredTodos, function(todo){
-				return todo.description.toLowerCase().indexOf(queryParams.q.toLowerCase()) > -1;
-		})
-	}
+	if(query.q && query.q.length > 0)
+		where.description = {
+			$like: "%"+query.q+"%"
+		}
 
-	return res.json(filteredTodos);
+	db.todo.findAll({where: where}).then(function(todos){
+		res.json(todos);
+	}).catch(function(error){
+		res.status(500).send(error);
+	});
+	
 });
 
 //GET todos/:id
