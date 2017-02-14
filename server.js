@@ -44,12 +44,15 @@ app.get('/todos', function(req, res){
 //GET todos/:id
 app.get('/todos/:id', function(req, res){
 	var id = parseInt(req.params.id, 10);
-	var todoID = _.findWhere(todoList, {id: id})
 
-	if(todoID)
-		res.json(todoID);
-	else
-		res.status(404).send();
+	db.todo.findById(id).then(function(todo){
+		if(todo)
+			res.json(todo);
+		else
+			res.status(404).send();
+	}).catch(function(error){
+		res.status(500);
+	});
 })
 
 //POST todos
