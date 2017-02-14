@@ -9,7 +9,7 @@ if(env === 'development'){
 	});
 }
 else{
-	var sequelize = new Sequelize(process.env.DATABSE_URL, {
+	var sequelize = new Sequelize(process.env.DATABASE_URL, {
 		'dialect': 'postgres'
 	});
 }
