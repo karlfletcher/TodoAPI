@@ -1,7 +1,7 @@
 var Sequelize = require('sequelize');
 var sequelize = new Sequelize(undefined, undefined, undefined, {
 	'dialect': 'sqlite',
-	'storage': 'basic-sqlite-database.sqlite' // file name to store databse in
+	'storage': __dirname + '/basic-sqlite-database.sqlite' // file name to store databse in
 });
 
 
@@ -20,33 +20,38 @@ var Todo = sequelize.define('todo', {
 	}
 });
 
+var User = sequelize.define('user', {
+	email: Sequelize.STRING
+});
+
+Todo.belongsTo(User);
+User.hasMany(Todo);
+
 sequelize.sync({
-	//force : true
+	// force : true
 }).then(function(){
 	console.log("Everything is synced.");
 
-	// Todo.create({
-	// 	description: "Take dog for a walk"
-	// }).then(function(todo){
-	// 	return Todo.create({
-	// 		description: "Give dog food"
-	// 	})
+	// User.create({
+	// 	email: "fletch254@live.co.uk"
 	// }).then(function(){
-		var todo = Todo.findById(2).then(function(todo){
-			if(todo)
-				console.log(todo);
-			else
-				console.error("Couldn't find task with specified ID.");
-		});
-
-		// return Todo.findAll({
-		// 	where : {
-		// 		description: {
-		// 			$like: '%Wal%'
-		// 		}
-		// 	}
-		// });
-	// }).catch(function(error){
-	// 	console.log(error);
+	// 	return Todo.create({
+	// 		description: "Tidy house"
+	// 	});
+	// }).then(function(todo){
+	// 	return User.findById(1).then(function(user){
+	// 		user.addTodo(todo);
+	// 	});
 	// });
+
+	var where = {};
+	where.completed = true;
+
+	User.findById(1).then(function(user){
+		user.getTodos({where: where}).then(function(todos){
+			todos.forEach(function(todo){
+				console.log(todo.toJSON());
+			})
+		})
+	})
 });

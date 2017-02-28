@@ -3,7 +3,6 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
 var db = require('./db.js');
-var bcrypt = require('bcryptjs');
 var middleware = require('./middleware.js')(db);
 
 //APP SETUP
@@ -66,7 +65,11 @@ app.post('/todos', middleware.requireAuthentication, function(req, res){
 	var body = _.pick(req.body, "description", "completed");
 	
 	db.todo.create(body).then(function(todo){
-		res.status(200).send(todo);
+		req.user.addTodo(todo).then(function(){
+			return todo.reload();
+		}).then(function(todo){
+			res.status(200).send(todo);
+		});
 	}).catch(function(e){
 		res.status(400).json(e);
 	});
