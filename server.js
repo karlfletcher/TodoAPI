@@ -114,7 +114,7 @@ app.put('/todos/:id', middleware.requireAuthentication, function(req, res){
 
 	db.todo.findOne({where: {
 		userId: req.user.get('id'),
-		id: id
+		id: req.params.id
 	}}).then(function(todo){
 
 		if(todo)
